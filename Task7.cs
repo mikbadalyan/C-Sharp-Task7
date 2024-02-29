@@ -1,75 +1,122 @@
-using System;
-using System.Linq;
+int row = 7;
+int col = 7;
+int[,] chessboard = new int[8, 8];
+int flag = 0;
+Console.ForegroundColor = ConsoleColor.White;
 
-class queen {
-
-    static readonly int N = 8;
-
-    public static int a = 4;
-
-    public static int b = 6;
-    
-    
-//Ստուգում ենք արդյո կարող ենք թագուհին դնել այդ տեղում թե ոչ
-    static bool isSafe(int[,] board, int row, int col)
+//Տպում ենք շախմատի տախտակը
+void visual(){
+    for (int i = 0; i < 8; i++)
     {
-
-        //Տողի ստուգում
-        for (int x = 0; x < col; x++)
-            if (board[row, x] == 1)
-                return false;
-
-        //անկյունագծի ստուգում
-        for (int x = row, y = col; x >= 0 && y >= 0;
-             x--, y--)
-            if (board[x, y] == 1)
-                return false;
-
-       //անկյունագծի ստուգում
-        for (int x = row, y = col; x < N && y >= 0;
-             x++, y--)
-            if (board[x, y] == 1)
-                return false;
-
-        //դաշտը ազատ է
-        return true;
+        for (int j = 0; j < 8; j++)
+        {
+            if (chessboard[i, j] == 9)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write("Q ");
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+            else if (chessboard[i, j] == 1)
+            {
+                Console.Write("1 ");
+            }
+            else
+            {
+                Console.Write("0 ");
+            }
+        }
+        Console.WriteLine();
     }
+    Console.WriteLine();
+    Console.WriteLine();
+    Console.WriteLine();
+    Console.WriteLine();
+    Console.WriteLine();
+}
 
-
-    static bool solveNQueens(int[,] board, int col)
+//Ավելացնել նոր թագուհի։
+int AddQueen(int row, int col)
+{
+    int c = 0;
+    for (int i = 0; i < 8; i++)
     {
-        
-        //տպել տախտակը
-        if (col == N) {
-            for (int i = 0; i < N; i++) {
-                for (int j = 0; j < N; j++) {
-                    Console.Write(board[i, j] + " ");
+        for (int j = 0; j < 8; j++)
+        {
+            if (row == i && col == j)
+            {
+                chessboard[i, j] = 9;
+            }
+            else if (chessboard[i, j] == 1 || chessboard[i, j] == 9)
+            {
+                continue;
+            }
+            else if ((Math.Abs(row - i) == Math.Abs(col - j)) || row == i || col == j)
+            {
+                chessboard[i, j] = 1;
+            }
+            else
+            {
+                c++;
+            }
+        }
+    }
+    return c;
+}
+
+int CheckPosition(int row, int col)
+{
+    int cc = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            if (row == i && col == j)
+            {
+                continue;
+            }
+            else if ((Math.Abs(row - i) == Math.Abs(col - j)) || row == i || col == j)
+            {
+                if (chessboard[i, j] == 0)
+                {
+                    cc++;
                 }
-                Console.WriteLine();
-            }
-            Console.WriteLine();
-            return true;
-        }
-
-        
-        for (int i = 0; i < N; i++) {
-            
-            if (isSafe(board, i, col)) {
-                board[i, col] = 1; // place the queen
-                if (solveNQueens(board, col + 1))
-                    return true;
-                board[i, col] = 0;
-                
             }
         }
-        return false;
     }
-    
-    public static void Main(string[] args)
+    return cc;
+}
+
+while(flag == 0)
+{
+    int c = AddQueen(row, col);
+    visual();
+   
+    if (c != 0)
     {
-        int[,] board = new int[N, N];
-        
-        if (!solveNQueens(board, 0))
-            Console.WriteLine("No solution found");
+        row = -1;
+        col = -1;
+        int minc = 100;
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (chessboard[i, j] != 1 && chessboard[i, j] != 9)
+                {
+                    int currentConflicts = CheckPosition(i, j);
+                    if (currentConflicts <= minc)
+                    {
+                        minc = currentConflicts;
+                        row = i;
+                        col = j;
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        Console.WriteLine("No valid position for placing the queen.");
+        flag = 1;
+        break;
     }
 }
